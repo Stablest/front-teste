@@ -5,6 +5,7 @@ import { Modal } from "./modal"
 import { ModalElement } from "./modal-element"
 import { FormEvent, useState } from "react"
 import { URL } from "@/utils/enums/URL"
+import { cpf } from "cpf-cnpj-validator"
 
 export interface ModalEditUserProps {
     user: IUser,
@@ -34,8 +35,15 @@ function ModalEditUser({ user, closeButtonHandler }: ModalEditUserProps) {
             birthDate: formData.get('birth-date')?.toString() || user.birthDate,
             permission: formData.get('permission') || user.permission
         }
-        const loggedUserJWT = window.localStorage.getItem('jwt_token')
+        if (!updatedUser.cpf)
+            return
+        updatedUser.cpf = cpf.format(updatedUser.cpf.toString())
+        if (!cpf.isValid(updatedUser.cpf?.toString())) {
+            setErrorMessage('Por favor insira um cpf válido')
+            return
+        }
         try {
+            const loggedUserJWT = window.localStorage.getItem('jwt_token')
             const res = await fetch(`${URL.BASE}/user/${user._id}`, {
                 method: 'PATCH',
                 headers: {
@@ -65,6 +73,10 @@ function ModalEditUser({ user, closeButtonHandler }: ModalEditUserProps) {
                     <input type="text" name="name" id="name" placeholder={user.name} />
                 </ModalElement>
                 <ModalElement
+                    name={<label htmlFor="login">Login</label>}>
+                    <input required type="text" name="login" id="login" />
+                </ModalElement>
+                <ModalElement
                     name={<label htmlFor="cpf">CPF</label>}>
                     <input type="text" name="cpf" id="cpf" placeholder={user.cpf.toString()} />
                 </ModalElement>
@@ -74,43 +86,43 @@ function ModalEditUser({ user, closeButtonHandler }: ModalEditUserProps) {
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="phone">Telefone</label>}>
-                    <input type="text" name="phone" placeholder={user.phone} />
+                    <input type="text" name="phone" id="phone" placeholder={user.phone} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="postal-code">CEP</label>}>
-                    <input type="text" name='postal-code' placeholder={user.postalCode} />
+                    <input type="text" name='postal-code' id="postal-code" placeholder={user.postalCode} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="adress">Endereço</label>}>
-                    <input type="text" name="adress" placeholder={user.adress} />
+                    <input type="text" name="adress" id="adress" placeholder={user.adress} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="number">Numero</label>}>
-                    <input type="text" name="adress-number" placeholder={user.adressNumber.toString()} />
+                    <input type="text" name="adress-number" id="number" placeholder={user.adressNumber.toString()} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="complement">Complemento</label>}>
-                    <input type="text" name="complement" placeholder={user.complement} />
+                    <input type="text" name="complement" id="complement" placeholder={user.complement} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="neighborhood">Bairro</label>}>
-                    <input type="text" name="neighborhood" placeholder={user.neighborhood} />
+                    <input type="text" name="neighborhood" id="neighborhood" placeholder={user.neighborhood} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="city">Cidade</label>}>
-                    <input type="text" name="city" placeholder={user.city} />
+                    <input type="text" name="city" id="city" placeholder={user.city} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="state">Estado</label>}>
-                    <input type="text" name="state" placeholder={user.state} />
+                    <input type="text" name="state" id="state" placeholder={user.state} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="birth-date">Data de Nascimento</label>}>
-                    <input type="datetime-local" name="birth-date" placeholder={user.birthDate as string} />
+                    <input type="datetime-local" name="birth-date" id="birth-date" placeholder={user.birthDate as string} />
                 </ModalElement>
                 <ModalElement
                     name={<label htmlFor="permission">Permissão</label>}>
-                    <input type="number" name="permission" placeholder={user.permission.toString()} />
+                    <input type="number" name="permission" id="permission" placeholder={user.permission.toString()} />
                 </ModalElement>
                 <div className="d-flex justify-content-around">
                     <button type="submit" className="bg-success text-light fs-4 px-2" style={{ height: '4rem' }}>Atualizar</button>

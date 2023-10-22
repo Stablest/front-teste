@@ -5,6 +5,7 @@ import { ModalElement } from "./modal-element"
 import { IUser } from "@/utils/interfaces/IUser"
 import { URL } from "@/utils/enums/URL"
 import { Modal } from "./modal"
+import { cpf } from "cpf-cnpj-validator"
 
 export interface ModalCreateUserProps {
     closeButtonHandler: () => void
@@ -19,6 +20,7 @@ function ModalCreateUser({ closeButtonHandler }: ModalCreateUserProps) {
         const formData = new FormData(event.currentTarget)
         const newUser = {
             name: formData.get('name'),
+            login: formData.get('login'),
             cpf: formData.get('cpf'),
             email: formData.get('email'),
             phone: formData.get('phone'),
@@ -33,8 +35,16 @@ function ModalCreateUser({ closeButtonHandler }: ModalCreateUserProps) {
             password: 0,
             permission: formData.get('permission')
         }
-        const loggedUserJWT = window.localStorage.getItem('jwt_token')
+        if (!newUser.cpf)
+            return
+        newUser.cpf = cpf.format(newUser.cpf.toString())
+        if (!cpf.isValid(newUser.cpf?.toString())) {
+            setErrorMessage('Por favor insira um cpf válido')
+            return
+        }
+
         try {
+            const loggedUserJWT = window.localStorage.getItem('jwt_token')
             const res = await fetch(`${URL.BASE}/user/`, {
                 method: 'POST',
                 headers: {
@@ -49,10 +59,9 @@ function ModalCreateUser({ closeButtonHandler }: ModalCreateUserProps) {
                 setErrorMessage(message)
                 return
             }
-            console.log(message)
             setErrorMessage(null)
+            window.location.href = '/dashboard'
         } catch (err) {
-            console.error(err)
             setErrorMessage('Houve um erro, tente novamente mais tarde...')
         }
     }
@@ -60,61 +69,67 @@ function ModalCreateUser({ closeButtonHandler }: ModalCreateUserProps) {
     return (
         <Modal>
             <form action='/dashboard' name="add-user-form" className="w-50 mx-auto bg-light rounded p-3 d-flex flex-column row-gap-4" onSubmit={(e) => formHandler(e)}>
-                <ModalElement
-                    name={<label htmlFor="add-user-form">Name</label>}>
-                    <input type="text" name="name" id="" />
+                <ModalElement name={<label htmlFor="name">Name</label>}>
+                    <input type="text" name="name" id="name" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">CPF</label>}>
-                    <input type="number" name="cpf" id="" />
+                    name={<label htmlFor="login">Login</label>}>
+                    <input required type="text" name="login" id="login" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">E-mail</label>}>
-                    <input type="email" name="email" id="" />
+                    name={<label htmlFor="cpf">CPF</label>}>
+                    <input type="text" name="cpf" id="cpf" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Telefone</label>}>
-                    <input type="number" name="phone" id="" />
+                    name={<label htmlFor="email">E-mail</label>}>
+                    <input type="text" name="email" id="email" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">CEP</label>}>
-                    <input type="number" name="postal-code" id="" />
+                    name={<label htmlFor="phone">Telefone</label>}>
+                    <input type="text" name="phone" id="phone" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Endereço</label>}>
-                    <input type="text" name="adress" id="" />
+                    name={<label htmlFor="postal-code">CEP</label>}>
+                    <input type="text" name='postal-code' id="postal-code" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Numero</label>}>
-                    <input type="number" name="adress-number" id="" />
+                    name={<label htmlFor="adress">Endereço</label>}>
+                    <input type="text" name="adress" id="adress" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Complemento</label>}>
-                    <input type="text" name="complement" id="" />
+                    name={<label htmlFor="number">Numero</label>}>
+                    <input type="text" name="adress-number" id="number" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Bairro</label>}>
-                    <input type="text" name="neighborhood" id="" />
+                    name={<label htmlFor="complement">Complemento</label>}>
+                    <input type="text" name="complement" id="complement" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Cidade</label>}>
-                    <input type="text" name="city" id="" />
+                    name={<label htmlFor="neighborhood">Bairro</label>}>
+                    <input type="text" name="neighborhood" id="neighborhood" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Estado</label>}>
-                    <input type="text" name="state" id="" />
+                    name={<label htmlFor="city">Cidade</label>}>
+                    <input type="text" name="city" id="city" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Data de Nascimento</label>}>
-                    <input type="datetime-local" name="birth-date" id="" />
+                    name={<label htmlFor="state">Estado</label>}>
+                    <input type="text" name="state" id="state" />
                 </ModalElement>
                 <ModalElement
-                    name={<label htmlFor="add-user-form">Permissão</label>}>
-                    <input type="number" name="permission" id="" />
+                    name={<label htmlFor="birth-date">Data de Nascimento</label>}>
+                    <input type="datetime-local" name="birth-date" id="birthDate" />
                 </ModalElement>
-                <div className="d-flex justify-content-around">
-                    <button type="submit" className="bg-success text-light fs-4 px-2" style={{ height: '4rem' }}>Adicionar</button>
-                    <button type="button" className="bg-danger text-light fs-4 px-2" onClick={closeButtonHandler} style={{ height: '4rem' }}>Cancelar</button>
+                <ModalElement
+                    name={<label htmlFor="permission">Permissão</label>}>
+                    <input type="number" name="permission" id="permission" />
+                </ModalElement>
+                <div className="d-flex flex-column">
+                    <div className="text-danger fw-semibold fs-5 my-3 align-self-center">{errorMessage}</div>
+                    <div className="d-flex justify-content-around">
+                        <button type="submit" className="bg-success text-light fs-4 px-2" style={{ height: '4rem' }}>Adicionar</button>
+                        <button type="button" className="bg-danger text-light fs-4 px-2" onClick={closeButtonHandler} style={{ height: '4rem' }}>Cancelar</button>
+                    </div>
                 </div>
             </form >
         </Modal>
