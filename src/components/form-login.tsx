@@ -31,7 +31,6 @@ function FormLogin() {
             setErrorMessage(null)
             window.location.href = '/dashboard'
         } catch (err) {
-            console.error(err)
             setErrorMessage('Houve um erro, tente novamente mais tarde...')
         }
     }
