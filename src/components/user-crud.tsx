@@ -1,18 +1,24 @@
 'use client'
 
-import { FormEvent, Suspense, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { TableUser } from "./table-user"
-import ModalCreateUser from "./modal-create-user"
+import { ModalCreateUser } from "./modal-create-user"
 import { IUser } from "@/utils/interfaces/IUser"
 import { URL } from "@/utils/enums/URL"
+import { ModalExportUser } from "./modal-export-user"
 
 function UserCRUD() {
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState<boolean>(false)
+    const [isExportUserModalOpen, setIsExportUserModalOpen] = useState<boolean>(false)
     const [users, setUsers] = useState<IUser[]>([])
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>([])
 
     function createButtonHandler() {
         setIsCreateUserModalOpen(!isCreateUserModalOpen)
+    }
+
+    function exportButtonHandler() {
+        setIsExportUserModalOpen(!isExportUserModalOpen)
     }
 
     function inputHandler(newValue: string) {
@@ -57,29 +63,30 @@ function UserCRUD() {
         }
     }, [])
 
-
-
     return (
-        <div className="px-3">
-            <div className="d-flex justify-content-between align-items-center column-gap-4 border-bottom pb-2">
-                <button type="button" className="bg-success text-light">Exportar</button>
-                <div className="d-flex">
-                    <button className="bg-black rounded text-white border-0 fs-3 d-flex justify-content-center align-items-center shadow-sm" style={{ width: '32px', height: '32px' }} onClick={createButtonHandler}>
-                        +
-                    </button>
-                    <form className="shadow-sm d-flex align-items-center">
-                        <input type="text" name="search-bar" className="" style={{ width: '', height: '32px' }} onChange={e => inputHandler(e.target.value)} />
-                        <button type="submit" className="bg-transparent border-0">
-                            <img src="find.svg" alt="Magnifier icon" className="bg-black rounded-end" width={'32px'} height={'32px'} />
-                        </button>
-                    </form>
-                </div>
-            </div>
+        <>
+            {isExportUserModalOpen ? <ModalExportUser closeButtonHandler={exportButtonHandler} users={displayedUsers}></ModalExportUser> : null}
             {isCreateUserModalOpen ? <ModalCreateUser closeButtonHandler={createButtonHandler}></ModalCreateUser> : null}
-            <Suspense>
+            <div className="mx-3">
+                <div className="d-flex justify-content-between align-items-center column-gap-4 border-bottom pb-2">
+                    <button type="button" className="bg-success text-light" onClick={exportButtonHandler}>Exportar</button>
+
+                    <div className="d-flex column-gap-2">
+                        <button className="rounded text-white border-0 fs-3 d-flex justify-content-center align-items-center shadow-sm" style={{ width: '32px', height: '32px' }} onClick={createButtonHandler}>
+                            <img src="plus.svg" alt="Plus sign" width={32} height={32} />
+                        </button>
+                        <div className="shadow-sm d-flex align-items-center">
+                            <input type="text" name="search-bar" className="" style={{ width: '', height: '32px' }} onChange={e => inputHandler(e.target.value)} />
+                            <button type="submit" className="bg-transparent border-0">
+                                <img src="find.svg" alt="Magnifier icon" className="bg-black rounded-end" width={32} height={32} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <TableUser users={displayedUsers}></TableUser>
-            </Suspense>
-        </div>
+            </div>
+        </>
+
     )
 }
 
