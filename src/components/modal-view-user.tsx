@@ -16,6 +16,9 @@ function ModalViewUser({ closeButtonHandler, user }: ModalViewUserProps) {
                 <ModalElement name={<div>Name</div>}>
                     {user.name}
                 </ModalElement>
+                <ModalElement name={<div>Login</div>}>
+                    {user.login}
+                </ModalElement>
                 <ModalElement
                     name={<div>CPF</div>}>
                     {user.cpf.toString()}
